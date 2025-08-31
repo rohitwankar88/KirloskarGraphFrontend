@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from "../assets/kirloskar_logo.jpg" // Adjust path if needed
+import logo from "/assets/kirloskar_logo.jpg" // Adjust path if needed
 
 export default function Header({ username, onLogout }) {
   return (

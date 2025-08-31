@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import CompressorForm from './components/CompressorForm';
 import Login from './components/Login';
 import Header from './components/Header';
-import kirloskarLogo from './assets/kirloskar_logo.jpg'; // Adjust path if needed
+import kirloskarLogo from '/assets/kirloskar_logo.jpg'; // Adjust path if needed
 
 function HomePage({ onStart }) {
   return (
