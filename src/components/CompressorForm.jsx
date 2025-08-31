@@ -32,11 +32,34 @@ export default function CompressorForm() {
   const [formData, setFormData] = useState({
     model: "KRS4115",
     refrigerant: "Ammonia",
+    evap_inp:"Evaporation Temperature (deg C)",
+    cond_inp:"Condenser Temperature (deg C)",
     evap_temp: 10.0,
     cond_temp: 30.0,
     superheat: 0.0,
     speed: 2980,
   });
+  // Preferred display order for output fields
+  const preferredFields = [
+    "Compressor Model",
+    "Suction Pressure (bar abs)",
+    "Evaporator Temperature (°C)",
+    "Discharge Pressure (bar abs)",
+    "Condenser Temperature (°C)",
+    "Discharge Temperature (deg C)",
+    "Speed (RPM)",
+    "Volume Flow Rate (kg/hr)",
+    "Compressor Shaft Power (kW)",
+    "Adiabatic Efficiency (%)",
+    "Volumetric Efficiency (%)",
+    "Isentropic Work (kW)",
+    "Refrigeration Effect (kW)",
+    "Volumetric Efficiency @3000 RPM (%)",
+    "Adiabatic Efficiency @3000 RPM (%)",
+    "Refrigeration Capacity @3000 RPM (kW)",
+    "Compressor Power @3000 RPM  (kW)",
+    "COP @3000 RPM"
+  ];
 
   const [results, setResults] = useState(null);
   const [error, setError] = useState("");
@@ -87,13 +110,25 @@ export default function CompressorForm() {
   const excludeFields = ["h1", "h2", "h3"];
 
   // ✅ Get all unique fields
+  // ✅ Get all unique fields dynamically, but use preferred order if possible
   const getAllFields = () => {
     const apiKeys = results ? Object.keys(results) : [];
-    const inputKeys = Object.keys(formData).map((k) => inputLabels[k] || k);
-
-    return Array.from(new Set([...apiKeys, ...inputKeys])).filter(
-      (key) => !excludeFields.includes(key)
+    const inputKeys = Object.keys(formData).map(k => inputLabels[k] || k);
+    // Remove unwanted fields from display
+    const removeFields = [
+      "Refrigerant",
+      "Torque (N-m)",
+      "cond_temp",
+      "evap_temp",
+      "Superheat (°C)"
+    ];
+    const allKeys = Array.from(new Set([...apiKeys, ...inputKeys])).filter(
+      key => !excludeFields.includes(key) && !removeFields.includes(key)
     );
+    // Place preferred fields first, then any others
+    const ordered = preferredFields.filter(f => allKeys.includes(f));
+    const rest = allKeys.filter(f => !preferredFields.includes(f));
+    return [...ordered, ...rest];
   };
 
   // ✅ Get display value for each field
@@ -334,6 +369,19 @@ const getEconomizerImage = async () => {
               )
             )}
           </select>
+          <label>Evap Input</label>
+          <select
+            name="evap_inp"
+            className="w-full p-2 mb-2 border rounded"
+            value={formData.evap_inp}
+            onChange={handleChange}
+          >
+            {["Evaporation Temperature (deg C)","Suction Pressure (bar)"].map(
+              (r) => (
+                <option key={r}>{r}</option>
+              )
+            )}
+          </select>
 
           <label>Evaporation Temperature (°C)</label>
           <input
@@ -343,7 +391,19 @@ const getEconomizerImage = async () => {
             value={formData.evap_temp}
             onChange={handleChange}
           />
-
+          <label>Cond Input</label>
+          <select
+            name="cond_inp"
+            className="w-full p-2 mb-2 border rounded"
+            value={formData.cond_inp}
+            onChange={handleChange}
+          >
+            {["Condenser Temperature (deg C)","Discharge Pressure (bar)"].map(
+              (r) => (
+                <option key={r}>{r}</option>
+              )
+            )}
+          </select>
           <label>Condenser Temperature (°C)</label>
           <input
             name="cond_temp"
